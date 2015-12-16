@@ -1,5 +1,6 @@
 #!/usr/bin/env ruby
 
+require 'fileutils'
 require 'streamio-ffmpeg'
 require 'yaml'
 
@@ -13,7 +14,7 @@ Dir.foreach(SRC) do |f|
   source = File.join(SRC, f)
   next unless File.file? source
 
-  File.cp source, File.join(DST, f)  # Keep source
+  FileUtils.cp source, File.join(DST, f)  # Keep source
 
   movie = FFMPEG::Movie.new(source)
 
@@ -25,6 +26,6 @@ Dir.foreach(SRC) do |f|
     movie.transcode(destination)
   end
 
-  File.rm(source)
+  FileUtils.rm(source)
 
 end
