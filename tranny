@@ -1,0 +1,30 @@
+#!/usr/bin/env ruby
+
+require 'streamio-ffmpeg'
+require 'yaml'
+
+BASE = File.dirname( __FILE__ )
+SRC = File.join(BASE, 'src')
+DST = File.join(BASE, 'dst')
+
+profiles = YAML.load_file( File.join(BASE, 'profiles.yml') )
+
+Dir.foreach(SRC) do |f|
+  source = File.join(SRC, f)
+  next unless File.file? source
+
+  File.cp source, File.join(DST, f)  # Keep source
+
+  movie = FFMPEG::Movie.new(source)
+
+  filename_no_extension = File.basename(f,File.extname(f))
+  profiles['all'].each do |p|
+    destination = File.join(DST, "#{filename_no_extension}.#{p}")
+    next if File.file?(File.join(DST, "#{filename_no_extension}.#{p}"))
+
+    movie.transcode(destination)
+  end
+
+  File.rm(source)
+
+end
